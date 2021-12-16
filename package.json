@@ -1,0 +1,16 @@
+{
+  "name": "puppeteer-to-playwright",
+  "version": "1.0.0",
+  "description": "Puppeteer to Playwright converter",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Hannes Lenke",
+  "license": "ISC",
+  "keywords": [],
+  "dependencies": {
+    "jscodeshift": "^0.13.0",
+    "ndb": "^1.1.5"
+  }
+}
