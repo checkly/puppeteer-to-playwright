@@ -2,6 +2,10 @@ export default function (fileInfo, api) {
     const j = api.jscodeshift;
     const root = j(fileInfo.source);
 
+    // if strict mode is set the codemod will act more conservatively
+    // and assume all explicit waits are actually necessary 
+    const MODE_STRICT = process.env.STRICT;
+
     root.find(j.Identifier, { name: 'puppeteer' }).filter(path => {
         return path.parent.value.type === 'VariableDeclarator' &&
             path.parent.value.init.type === 'CallExpression' &&
@@ -28,27 +32,39 @@ export default function (fileInfo, api) {
     });
   
     root.find(j.Identifier, { name: 'setViewport' }).replaceWith(j.identifier('setViewportSize'));
-  
+
+    root.find(j.AwaitExpression).filter(path => {
+        if (!path.value.argument.callee) {
+            return false
+        }
+        return !MODE_STRICT && (path.value.argument.callee.name === 'sleep')
+    }).remove()
+
+    root.find(j.AwaitExpression).filter(path => {
+        return !MODE_STRICT && (path.value.argument.name === 'navigationPromise')
+    }).remove()
+    
+    root.find(j.AwaitExpression).filter(path => {
+        if (!path.value.argument.callee.property) {
+            return false
+        }
+        return !MODE_STRICT && (path.value.argument.callee.property.name === 'waitForNetworkIdle')
+    }).remove()
+
     // remove waitForSelector only when returned element is not used
     root.find(j.AwaitExpression).filter(path => {
-		console.log(path.parent.value.type == 'VariableDeclarator')
-      return path.value.argument.callee.property.name === 'waitForSelector' &&
+        if (!path.value.argument.callee || !path.value.argument.callee.property) {
+            return false
+        }
+        return !MODE_STRICT && path.value.argument.callee.property.name === 'waitForSelector' &&
           path.parent.value.type !== 'VariableDeclarator'
     }).remove()
 
-    // TODO add strict mode
     root.find(j.Identifier, { name: 'waitForXPath' }).replaceWith(j.identifier('waitForSelector'));
-    root.find(j.AwaitExpression).filter(path => {
-        return path.value.argument.callee.property.name === 'waitForNetworkIdle'
-    }).remove()
 
     root.find(j.Identifier, { name: '$x' }).replaceWith(j.identifier('$'))
 
     root.find(j.Identifier, { name: 'waitFor' }).replaceWith(j.identifier('waitForTimeout'));
     root.find(j.Identifier, { name: 'type' }).replaceWith(j.identifier('fill'));
-    
-    // cookies
-    root.find(j.Identifier, { name: 'page.cookies' }).replaceWith(j.identifier('context.cookies'));
-
     return root.toSource();
 }
