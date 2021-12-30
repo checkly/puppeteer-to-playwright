@@ -2,7 +2,6 @@ const { chromium } = require('playwright');
 const browser = await chromium.launch()
 const context = await browser.newContext()
 const page = await context.newPage()
-const navigationPromise = page.waitForNavigation()
 const expect = require('chai').expect
 
 const elementHandle = await page.$('iframe');

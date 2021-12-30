@@ -73,6 +73,13 @@ export default function (fileInfo, api) {
         return !MODE_STRICT && (path.value.argument.callee.name === 'sleep')
     }).remove()
 
+    root.find(j.VariableDeclaration).filter(path => {
+        if (!path.value.declarations[0].init.callee || !path.value.declarations[0].init.callee.property) {
+            return
+        }
+        return !MODE_STRICT && path.value.declarations[0].init.callee.property.name === 'waitForNavigation'
+    }).remove()
+
     root.find(j.AwaitExpression).filter(path => {
         return !MODE_STRICT && (path.value.argument.name === 'navigationPromise')
     }).remove()

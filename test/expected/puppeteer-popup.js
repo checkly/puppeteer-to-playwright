@@ -5,8 +5,6 @@ const { chromium } = require('playwright');
     const context = await browser.newContext()
     const page = await context.newPage()
 
-    const navigationPromise = page.waitForNavigation()
-
     await page.goto('https://www.url.com')
 
     await page.click('.Product-options-main #form-action-addToCart')
