@@ -65,8 +65,6 @@ export default function (fileInfo, api) {
             path.value.declarations[0].init.argument.callee.object.name === "browser"
     }).replaceWith(`const ${varPage} = await ${varContext}.newPage()`)
 
-    root.find(j.Identifier, { name: 'setViewport' }).replaceWith(j.identifier('setViewportSize'));
-
     // Remove sleeps
     root.find(j.AwaitExpression).filter(path => {
         if (!path.value.argument.callee) {
@@ -114,9 +112,12 @@ export default function (fileInfo, api) {
     }).remove()
 
     // Update method names
+    root.find(j.Identifier, { name: 'setViewport' }).replaceWith(j.identifier('setViewportSize'));
     root.find(j.Identifier, { name: 'waitForXPath' }).replaceWith(j.identifier('waitForSelector'));
     root.find(j.Identifier, { name: '$x' }).replaceWith(j.identifier('$'))
     root.find(j.Identifier, { name: 'type' }).replaceWith(j.identifier('fill'));
+    
+    // Handle reading cookies
     root.find(j.CallExpression).filter(path => {
         if (!path.value.callee.property) {
             return
@@ -150,6 +151,15 @@ export default function (fileInfo, api) {
         }).insertBefore('// TODO: ensure the following line references the right context')
 
     }
+
+    // Handle clearing cookies
+    root.find(j.AwaitExpression).filter(path => {
+        if (!path.value.argument || !path.value.argument.callee) {
+            return
+        }
+        return path.value.argument.callee.property.name == 'deleteCookie'
+    }).replaceWith(`// TODO: this deletes all cookies - ensure this is fine\nawait ${varContext}.clearCookies()`)
+
 
     return root.toSource();
 }
