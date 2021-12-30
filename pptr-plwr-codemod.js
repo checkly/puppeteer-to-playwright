@@ -2,11 +2,11 @@ export default function (fileInfo, api) {
     const j = api.jscodeshift;
     const root = j(fileInfo.source);
 
-    // if strict mode is set the codemod will act more conservatively
+    // If strict mode is set the codemod will act more conservatively
     // and assume all explicit waits are actually necessary 
     const MODE_STRICT = process.env.STRICT;
 
-    // if possible, reuse existing variable names for context and page
+    // If possible, reuse existing variable names for context and page
     // otherwise, use defaults
     let contextName = 'context'
     let pageName = 'page'
@@ -32,7 +32,7 @@ export default function (fileInfo, api) {
     }
     ).toSource();
 
-    // Remove existing context creation
+    // Remove existing context creation, save context variable name for reuse
     root.find(j.VariableDeclaration).filter(path => {
         if (!path.value.declarations[0].init.argument) {
             return
@@ -44,7 +44,7 @@ export default function (fileInfo, api) {
             path.value.declarations[0].init.argument.callee.object.name === "browser"
     }).remove()
 
-    // Force context creation
+    // Force context creation, save page variable name for reuse
     root.find(j.VariableDeclaration).filter(path => {
         if (!path.value.declarations[0].init.argument) {
             return
@@ -56,6 +56,7 @@ export default function (fileInfo, api) {
             path.value.declarations[0].init.argument.callee.object.name === "browser"
     }).insertBefore(`const ${contextName} = await browser.newContext()`)
 
+    // Page creation from context
     root.find(j.VariableDeclaration).filter(path => {
         if (!path.value.declarations[0].init.argument) {
             return
@@ -66,6 +67,7 @@ export default function (fileInfo, api) {
 
     root.find(j.Identifier, { name: 'setViewport' }).replaceWith(j.identifier('setViewportSize'));
 
+    // Remove sleeps
     root.find(j.AwaitExpression).filter(path => {
         if (!path.value.argument.callee) {
             return false
@@ -73,6 +75,7 @@ export default function (fileInfo, api) {
         return !MODE_STRICT && (path.value.argument.callee.name === 'sleep')
     }).remove()
 
+    // Remove waitForNavigation
     root.find(j.VariableDeclaration).filter(path => {
         if (!path.value.declarations[0].init.callee || !path.value.declarations[0].init.callee.property) {
             return
@@ -80,10 +83,12 @@ export default function (fileInfo, api) {
         return !MODE_STRICT && path.value.declarations[0].init.callee.property.name === 'waitForNavigation'
     }).remove()
 
+    // Remove navigationPromise
     root.find(j.AwaitExpression).filter(path => {
         return !MODE_STRICT && (path.value.argument.name === 'navigationPromise')
     }).remove()
 
+    // Remove waitForNetworkIdle
     root.find(j.AwaitExpression).filter(path => {
         if (!path.value.argument.callee.property) {
             return false
@@ -91,7 +96,7 @@ export default function (fileInfo, api) {
         return !MODE_STRICT && (path.value.argument.callee.property.name === 'waitForNetworkIdle')
     }).remove()
 
-    // remove waitForSelector only when returned element is not used
+    // Remove waitForSelector only when returned element is not used
     root.find(j.AwaitExpression).filter(path => {
         if (!path.value.argument.callee || !path.value.argument.callee.property) {
             return false
@@ -100,10 +105,9 @@ export default function (fileInfo, api) {
             path.parent.value.type !== 'VariableDeclarator'
     }).remove()
 
+    // Method name changes
     root.find(j.Identifier, { name: 'waitForXPath' }).replaceWith(j.identifier('waitForSelector'));
-
     root.find(j.Identifier, { name: '$x' }).replaceWith(j.identifier('$'))
-
     root.find(j.Identifier, { name: 'waitFor' }).replaceWith(j.identifier('waitForTimeout'));
     root.find(j.Identifier, { name: 'type' }).replaceWith(j.identifier('fill'));
 
