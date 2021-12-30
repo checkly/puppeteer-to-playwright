@@ -75,6 +75,15 @@ export default function (fileInfo, api) {
         return !MODE_STRICT && (path.value.argument.callee.name === 'sleep')
     }).remove()
 
+      // Remove waitForTimeout and waitFor
+      root.find(j.AwaitExpression).filter(path => {
+        if (!path.value.argument.callee) {
+            return false
+        }
+      console.log(path.value.argument.callee.property.name === "waitForTimeout")
+        return !MODE_STRICT && (path.value.argument.callee.property.name === "waitForTimeout" || path.value.argument.callee.property.name === "waitFor")
+    }).remove()
+
     // Remove waitForNavigation
     root.find(j.VariableDeclaration).filter(path => {
         if (!path.value.declarations[0].init.callee || !path.value.declarations[0].init.callee.property) {
@@ -108,7 +117,6 @@ export default function (fileInfo, api) {
     // Method name changes
     root.find(j.Identifier, { name: 'waitForXPath' }).replaceWith(j.identifier('waitForSelector'));
     root.find(j.Identifier, { name: '$x' }).replaceWith(j.identifier('$'))
-    root.find(j.Identifier, { name: 'waitFor' }).replaceWith(j.identifier('waitForTimeout'));
     root.find(j.Identifier, { name: 'type' }).replaceWith(j.identifier('fill'));
 
     const el = root.find(j.SpreadElement) // TODO get if setcookie
