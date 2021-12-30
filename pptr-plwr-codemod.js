@@ -8,8 +8,8 @@ export default function (fileInfo, api) {
 
     // If possible, reuse existing variable names for context and page
     // otherwise, use defaults
-    let contextName = 'context'
-    let pageName = 'page'
+    let varContext = 'context'
+    let varPage = 'page'
 
     root.find(j.Identifier, { name: 'puppeteer' }).filter(path => {
         return path.parent.value.type === 'VariableDeclarator' &&
@@ -38,7 +38,7 @@ export default function (fileInfo, api) {
             return
         }
         if (path.value.declarations[0].init.argument.callee.property.name === "createIncognitoBrowserContext") {
-            contextName = path.value.declarations[0].id.name
+            varContext = path.value.declarations[0].id.name
         }
         return path.value.declarations[0].init.argument.callee.property.name === "createIncognitoBrowserContext" &&
             path.value.declarations[0].init.argument.callee.object.name === "browser"
@@ -50,11 +50,11 @@ export default function (fileInfo, api) {
             return
         }
         if (path.value.declarations[0].init.argument.callee.property.name === "newPage") {
-            pageName = path.value.declarations[0].id.name
+            varPage = path.value.declarations[0].id.name
         }
         return path.value.declarations[0].init.argument.callee.property.name === "newPage" &&
             path.value.declarations[0].init.argument.callee.object.name === "browser"
-    }).insertBefore(`const ${contextName} = await browser.newContext()`)
+    }).insertBefore(`const ${varContext} = await browser.newContext()`)
 
     // Page creation from context
     root.find(j.VariableDeclaration).filter(path => {
@@ -63,7 +63,7 @@ export default function (fileInfo, api) {
         }
         return path.value.declarations[0].init.argument.callee.property.name === "newPage" &&
             path.value.declarations[0].init.argument.callee.object.name === "browser"
-    }).replaceWith(`const ${pageName} = await ${contextName}.newPage()`)
+    }).replaceWith(`const ${varPage} = await ${varContext}.newPage()`)
 
     root.find(j.Identifier, { name: 'setViewport' }).replaceWith(j.identifier('setViewportSize'));
 
@@ -114,14 +114,22 @@ export default function (fileInfo, api) {
             path.parent.value.type !== 'VariableDeclarator'
     }).remove()
 
-    // Method name changes
+    // Update method names
     root.find(j.Identifier, { name: 'waitForXPath' }).replaceWith(j.identifier('waitForSelector'));
     root.find(j.Identifier, { name: '$x' }).replaceWith(j.identifier('$'))
     root.find(j.Identifier, { name: 'type' }).replaceWith(j.identifier('fill'));
 
-    const el = root.find(j.SpreadElement) // TODO get if setcookie
-    if (el.length > 0) {
-        const elName = el.get().value.argument.name;
+    // Handle setting cookies
+  	const varCookies = root.find(j.AwaitExpression).filter(path => {
+      if (!path.value.argument.arguments[0] || !path.value.argument.arguments[0].argument) {
+        return
+      }
+      console.log(path.value.argument.arguments[0].argument.name)
+	 return path.value.argument.callee.property.name == 'setCookie'
+    })
+  
+    if (varCookies.length > 0) {
+        const elName = varCookies.get().value.argument.callee.property.name
 
         root.find(j.CallExpression).filter(path => {
             if (!path.value.callee.property || !path.value.callee) {
