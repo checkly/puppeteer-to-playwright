@@ -56,7 +56,7 @@ export default function (fileInfo, api) {
             path.value.declarations[0].init.argument.callee.object.name === "browser"
     }).insertBefore(`const ${varContext} = await browser.newContext()`)
 
-    // Page creation from context
+    // Handle page creation from context
     root.find(j.VariableDeclaration).filter(path => {
         if (!path.value.declarations[0].init.argument) {
             return
