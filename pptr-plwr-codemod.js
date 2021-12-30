@@ -75,12 +75,11 @@ export default function (fileInfo, api) {
         return !MODE_STRICT && (path.value.argument.callee.name === 'sleep')
     }).remove()
 
-      // Remove waitForTimeout and waitFor
-      root.find(j.AwaitExpression).filter(path => {
+    // Remove waitForTimeout and waitFor
+    root.find(j.AwaitExpression).filter(path => {
         if (!path.value.argument.callee) {
             return false
         }
-      console.log(path.value.argument.callee.property.name === "waitForTimeout")
         return !MODE_STRICT && (path.value.argument.callee.property.name === "waitForTimeout" || path.value.argument.callee.property.name === "waitFor")
     }).remove()
 
@@ -118,16 +117,21 @@ export default function (fileInfo, api) {
     root.find(j.Identifier, { name: 'waitForXPath' }).replaceWith(j.identifier('waitForSelector'));
     root.find(j.Identifier, { name: '$x' }).replaceWith(j.identifier('$'))
     root.find(j.Identifier, { name: 'type' }).replaceWith(j.identifier('fill'));
+    root.find(j.CallExpression).filter(path => {
+        if (!path.value.callee.property) {
+            return
+        }
+        return path.value.callee.property.name === 'cookies'
+    }).replaceWith(`await ${varContext}.cookies()`)
 
     // Handle setting cookies
-  	const varCookies = root.find(j.AwaitExpression).filter(path => {
-      if (!path.value.argument.arguments[0] || !path.value.argument.arguments[0].argument) {
-        return
-      }
-      console.log(path.value.argument.arguments[0].argument.name)
-	 return path.value.argument.callee.property.name == 'setCookie'
+    const varCookies = root.find(j.AwaitExpression).filter(path => {
+        if (!path.value.argument || !path.value.argument.callee) {
+            return
+        }
+        return path.value.argument.callee.property.name == 'setCookie'
     })
-  
+
     if (varCookies.length > 0) {
         const elName = varCookies.get().value.argument.callee.property.name
 
@@ -139,7 +143,7 @@ export default function (fileInfo, api) {
         }).replaceWith(j.callExpression(j.memberExpression(j.identifier('browserContext'), j.identifier('addCookies'), false), [j.identifier(elName)]))
 
         root.find(j.ExpressionStatement).filter(path => {
-            if (!path.value.expression || !path.value.expression.argument) {
+            if (!path.value.expression || !path.value.expression.argument || !path.value.expression.argument.callee) {
                 return false
             }
             return path.value.expression.argument.callee.property.name === 'addCookies'
