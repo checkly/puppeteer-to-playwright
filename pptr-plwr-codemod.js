@@ -30,7 +30,7 @@ export default function (fileInfo, api) {
         }
         return path.value;
     }
-    ).toSource();
+    )
 
     // Remove existing context creation, save context variable name for reuse
     root.find(j.VariableDeclaration).filter(path => {
@@ -159,7 +159,6 @@ export default function (fileInfo, api) {
         }
         return path.value.argument.callee.property.name == 'deleteCookie'
     }).replaceWith(`// TODO: this deletes all cookies - ensure this is fine\nawait ${varContext}.clearCookies()`)
-
 
     return root.toSource();
 }

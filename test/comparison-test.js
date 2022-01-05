@@ -8,7 +8,7 @@ const dirOut = nfs.readdirSync('test/output')
 for (dir of dirOut) {
     const scriptTransformed = nfs.readFileSync(`test/output/${dir}`)
     const scriptExpected = nfs.readFileSync(`test/expected/${dir}`)
-    console.log('>>> Comparing ' + dir)
+    console.log('>>> Converting and comparing ' + dir)
     assert(scriptTransformed.equals(scriptExpected))
 }
 
