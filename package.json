@@ -4,15 +4,17 @@
   "description": "Puppeteer to Playwright converter",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/jscodeshift -t pptr-plwr-codemod.js test/output/puppeteer-*.js -p --run-in-band && node test/comparison-test.js",
-    "dryrun": "./node_modules/.bin/jscodeshift -t pptr-plwr-codemod.js test/output/puppeteer-*.js -d -p --run-in-band"
+    "test": "./node_modules/.bin/jscodeshift test/output/puppeteer-*.js -p --run-in-band && node test/comparison-test.js",
+    "dryrun": "./node_modules/.bin/jscodeshift test/output/puppeteer-*.js -d -p --run-in-band",
+    "convert": "./node_modules/.bin/jscodeshift -p --run-in-band"
   },
   "author": "Hannes Lenke",
-  "license": "ISC",
-  "keywords": [],
+  "contributors": [
+    "Giovanni Rago (https://ragog90.com)"
+  ],
+  "license": "MIT",
   "dependencies": {
-    "jscodeshift": "^0.13.0",
-    "ndb": "^1.1.5"
+    "jscodeshift": "^0.13.0"
   },
   "devDependencies": {
     "chai": "^4.3.4"

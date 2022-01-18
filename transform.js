@@ -182,4 +182,5 @@ export default function (fileInfo, api) {
 		.replaceWith(`// TODO: this deletes all cookies - ensure this is fine\nawait ${varContext}.clearCookies()`);
 
 	return root.toSource();
+
 }
