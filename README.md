@@ -51,11 +51,14 @@ $ npm run convert -- -d -p my-puppeteer-script.js
 
 ### Convert script
 
+You can convert scripts one by one...
+
 ```
 $ npm run convert my-puppeteer-script.js
 ```
 
-### Convert entire folder of scripts
+...or you can convert entire folders recursively.
+
 
 ```
 $ npm run convert my-puppeteer-folder
