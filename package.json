@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "description": "Puppeteer to Playwright converter",
   "scripts": {
-    "test": "./node_modules/.bin/jscodeshift test/output/puppeteer-*.js -p --run-in-band && node test/comparison-test.js",
-    "dryrun": "./node_modules/.bin/jscodeshift -d -p --run-in-band",
-    "convert": "./node_modules/.bin/jscodeshift -p --run-in-band"
+    "test": "jscodeshift test/output/puppeteer-*.js --run-in-band && node test/comparison-test.js",
+    "convert": "jscodeshift --run-in-band"
   },
   "author": "Hannes Lenke",
   "contributors": [
