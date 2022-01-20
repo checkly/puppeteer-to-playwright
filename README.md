@@ -14,41 +14,46 @@
 
 `puppeteer-to-playwright` will convert your existing Puppeteer script to Playwright, including:
 
-* Converting import statements
-* Converting basic methods to match new API (e.g. `setViewport` to `setViewportSize` and similar)
-* Creating browser context explicitly
-* Eliminating explicit waiting (unless `STRICT` mode is enabled)
-* Converting cookies-related commands
+- Converting import statements
+- Converting basic methods to match new API (e.g. `setViewport` to `setViewportSize` and similar)
+- Creating browser context explicitly
+- Eliminating explicit waiting (unless `STRICT` mode is enabled)
+- Converting cookies-related commands
 
 ### 🛑 Currently unsupported
 
-* File upload
-* File download
-* Request/response interception
+- File upload
+- File download
+- Request/response interception
 
 ## 🚢 Getting Started
+
 You can use `puppeteer-to-playwright` on a script file or multiple scripts at a time.
 
-> *It will overwrite the script file when run*, so we recommend doing a dry-run first
+> _It will overwrite the script file when run_, so we recommend doing a dry-run first
 
 1.  Dry run
+
 ```
-npm run dryrun
+$ npm run dryrun
 ```
 
 2. Convert script
+
 ```
-npm run convert my-puppeteer-script.js
+$ npm run convert my-puppeteer-script.js
 ```
 
 3. Convert entire folder of scripts
+
 ```
-npm run convert my-puppeteer-folder
+$ npm run convert my-puppeteer-folder
 ```
 
 ## 🔗 Links
-* [jscodeshift](https://github.com/facebook/jscodeshift) - without which this project wouldn't be possible.
-* [ASTExplorer](https://astexplorer.net/) - useful debugging tool in case you would like to modify the transform file of this project to tweak its output
+
+- [jscodeshift](https://github.com/facebook/jscodeshift) - without which this project wouldn't be possible.
+- [ASTExplorer](https://astexplorer.net/) - useful debugging tool in case you would like to modify the transform file of this project to tweak its output
 
 ## 📄 License
 
