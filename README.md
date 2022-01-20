@@ -33,7 +33,7 @@ You can use `puppeteer-to-playwright` on a script file or multiple scripts at a 
 
 > _It will overwrite the script file when run_, so we recommend doing a dry-run first
 
-1.  Dry run
+### Dry run
 
 A dry run will run the conversion without acutally writing to the file(s) you point it at.
 
@@ -49,13 +49,13 @@ $ npm run convert -- -d -p my-puppeteer-script.js
 
 > You can pass additional jscodeshift parameters as described in the [project's repository]((https://github.com/facebook/jscodeshift)).
 
-2. Convert script
+### Convert script
 
 ```
 $ npm run convert my-puppeteer-script.js
 ```
 
-3. Convert entire folder of scripts
+### Convert entire folder of scripts
 
 ```
 $ npm run convert my-puppeteer-folder
