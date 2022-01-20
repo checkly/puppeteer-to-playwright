@@ -7,6 +7,7 @@
   <img src="https://img.shields.io/github/workflow/status/checkly/puppeteer-to-playwright/ci?label=test" alt="Github Action - CI Test"/>
   <img src="https://img.shields.io/github/package-json/v/checkly/puppeteer-to-playwright" alt="Github package.json Version" />
 </p>
+<br />
 
 `puppeteer-to-playwright` automatically converts Javascript Puppeteer scripts to Playwright, aiming to reduce the amount of manual work involved in such a migration (ideally reducing it to zero). It is heavily based on [jscodeshift](https://github.com/facebook/jscodeshift).
 
@@ -61,7 +62,7 @@ $ npm run convert my-puppeteer-folder
 
 <p align="center">
   <a href="https://checklyhq.com?utm_source=github&utm_medium=sponsor-logo-github&utm_campaign=headless-recorder" target="_blank">
-  <img width="100px" src="./assets/checkly-logo.png?raw=true" alt="Checkly" />
+  <img width="100px" src="https://github.com/checkly/headless-recorder/raw/main/assets/checkly-logo.png?raw=true" alt="Checkly" />
   </a>
   <br />
   <i><sub>Delightful Active Monitoring for Developers</sub></i>
