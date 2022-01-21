@@ -152,7 +152,7 @@ export default function (fileInfo, api) {
 	});
 
 	if (varCookies.length > 0) {
-		const elName = varCookies.get().value.argument.callee.property.name;
+		const elName = varCookies.get().value.argument.arguments[0].argument.name;
 
 		root
 			.find(j.CallExpression)
@@ -182,5 +182,4 @@ export default function (fileInfo, api) {
 		.replaceWith(`// TODO: this deletes all cookies - ensure this is fine\nawait ${varContext}.clearCookies()`);
 
 	return root.toSource();
-
 }
