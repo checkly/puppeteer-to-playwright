@@ -11,7 +11,7 @@ const fs = require('fs');
   await page.click('#L2AGLb')
   await page.waitForNavigation()
 
-  const cookies = await await context.cookies()
+  let cookies = await await context.cookies()
   const cookieJson = JSON.stringify(cookies)
 
   fs.writeFileSync('cookies.json', cookieJson)
