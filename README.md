@@ -29,7 +29,7 @@ The following features are not yet supported, meaning that the corresponding ins
 - File download
 - Request/response interception
 
-If you would like to implement these, see our [how to contribute](#how-to-contribute) section.
+If you would like to implement these, see our [how to contribute](#-how-to-contribute) section.
 
 ## 🚢 Getting Started
 
