@@ -18,20 +18,24 @@
 - Converting import statements
 - Converting basic methods to match new API (e.g. `setViewport` to `setViewportSize` and similar)
 - Creating browser context explicitly
-- Eliminating explicit waiting (unless `STRICT` mode is enabled)
+- Eliminating explicit waiting (unless [Strict mode is enabled](#strict-mode))
 - Converting cookies-related commands
 
 ### 🛑 Currently unsupported
+
+The following features are not yet supported, meaning that the corresponding instructions won't be converted to Playwright if they are used in your Puppeteer script:
 
 - File upload
 - File download
 - Request/response interception
 
+If you would like to implement these, see our [how to contribute](#-how-to-contribute) section.
+
 ## 🚢 Getting Started
 
 You can use `puppeteer-to-playwright` on a script file or multiple scripts at a time.
 
-> _It will overwrite the script file when run_, so we recommend doing a dry-run first
+> 🚨 _It will overwrite the script file when run_, so we recommend doing a dry-run first
 
 ### Dry run
 
@@ -59,10 +63,26 @@ $ npm run convert my-puppeteer-script.js
 
 ...or you can convert entire folders recursively.
 
-
 ```
 $ npm run convert my-puppeteer-folder
 ```
+
+> puppeteer-to-playwright will ignore files that have any extension other than `.js`, as well as those that do not import/require Puppeteer
+
+### Strict mode
+
+When converting files, puppeteer-to-playwright will, by default, get rid of likely unnecessary waits that Playwright should handle automatically. If you know that the waits in your Puppeteer script will remain necessary even with Playwright, you can set puppeteer-to-playwright to Strict mode by running `export STRICT=true`. Alternatively, you can set the flag directly when converting a file or folder, e.g.: 
+```STRICT=true npm run convert my-puppeteer-folder```
+
+## 🤝 How to contribute
+
+If you would like to improve this codemod, you are very welcome to send a PR. Make sure it contains a test for the specific feature you are trying to add. Testing is currently set up as follows:
+
+1. In `test/base` you have the original Puppeteer script
+2. In `test/output` you have the original Puppeteer script, which will be automatically converted when tests are run then immediately restored to the original
+3. In `test/expected` you have the expected Playwright script that your result will need to be equal to
+
+You can run `npm run test` locally, and tests will run automatically for each new PR.
 
 ## 🔗 Links
 
