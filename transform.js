@@ -8,6 +8,7 @@ export default function (fileInfo, api) {
 
 	// If possible, reuse existing variable names for context and page
 	// otherwise, use defaults
+	let varBrowser = 'browser';
 	let varContext = 'context';
 	let varPage = 'page';
 
@@ -32,6 +33,30 @@ export default function (fileInfo, api) {
 
 	if (puppeteerImport.paths().length || puppeteerRequire.paths().length) {
 
+		let initDeclaration = root
+			.find(j.VariableDeclaration)
+			.filter((path) => {
+				return  (
+					path.value?.declarations?.[0]?.init?.argument?.callee?.object?.name === 'puppeteer'
+				);
+			})
+
+		if (initDeclaration.length) {
+			varBrowser = initDeclaration.get().value.declarations[0].id.name
+		}
+
+		let initAssignment = root
+			.find(j.AssignmentExpression)
+			.filter((path) => {
+				return  (
+					path.value?.right?.argument?.callee?.object?.name === 'puppeteer'
+				);
+			})
+
+		if (initAssignment.length) {
+			varBrowser = initAssignment.get().value.left.name
+		}
+
 		// Handle puppeteer require
 		root
 			.find(j.Identifier, { name: 'puppeteer' })
@@ -43,6 +68,18 @@ export default function (fileInfo, api) {
 					path.parent.value.init.callee.name === 'require' &&
 					path.parent.value.init.arguments[0].type === 'Literal' &&
 					path.parent.value.init.arguments[0].value === 'puppeteer'
+				);
+			})
+			.replaceWith((path) => {
+				return j.identifier('{ chromium }');
+			});
+
+		// Handle puppeteer import
+		root
+			.find(j.Identifier, { name: 'puppeteer' })
+			.filter((path) => {
+				return (
+					path?.parent?.value?.type === 'ImportDefaultSpecifier'
 				);
 			})
 			.replaceWith((path) => {
@@ -67,7 +104,7 @@ export default function (fileInfo, api) {
 				}
 				return (
 					path.value?.declarations[0]?.init?.argument?.callee?.property?.name === 'createIncognitoBrowserContext' &&
-					path.value.declarations[0].init.argument.callee.object.name === 'browser'
+					path.value.declarations[0].init.argument.callee.object.name === varBrowser
 				);
 			})
 			.remove();
@@ -81,10 +118,10 @@ export default function (fileInfo, api) {
 				}
 				return (
 					path.value?.declarations[0]?.init?.argument?.callee?.property?.name === 'newPage' &&
-					path.value.declarations[0].init.argument.callee.object.name === 'browser'
+					path.value.declarations[0].init.argument.callee.object.name === varBrowser
 				);
 			})
-			.insertBefore(`const ${varContext} = await browser.newContext()`);
+			.insertBefore(`const ${varContext} = await ${varBrowser}.newContext();`);
 
 		// Handle page creation from context
 		root
@@ -92,10 +129,49 @@ export default function (fileInfo, api) {
 			.filter((path) => {
 				return (
 					path.value?.declarations[0]?.init?.argument?.callee?.property?.name === 'newPage' &&
-					path.value.declarations[0].init.argument.callee.object.name === 'browser'
+					path.value.declarations[0].init.argument.callee.object.name === varBrowser
 				);
 			})
-			.replaceWith(`const ${varPage} = await ${varContext}.newPage()`);
+			.replaceWith(`const ${varPage} = await ${varContext}.newPage();`);
+
+		// Remove existing context creation, save context variable name for reuse (assignment)
+		root
+			.find(j.AssignmentExpression)
+			.filter((path) => {
+				if (path.value?.right?.argument?.callee?.property?.name === 'createIncognitoBrowserContext') {
+					varContext = path.value.left.name;
+				}
+				return (
+					path.value?.right?.argument?.callee?.property?.name === 'createIncognitoBrowserContext' &&
+					path.value?.right?.argument?.callee?.object?.name === varBrowser
+				);
+			})
+			.remove();
+
+		// Force context creation, save page variable name for reuse (assignment)
+		root
+			.find(j.ExpressionStatement)
+			.filter((path) => {
+				if (path.value?.expression?.right?.argument?.callee?.property?.name === 'newPage') {
+					varPage = path.value?.expression?.left?.name;
+				}
+				return (
+					path.value?.expression?.right?.argument?.callee?.property?.name === 'newPage' &&
+					path.value?.expression?.right?.argument?.callee?.object?.name === varBrowser
+				);
+			})
+			.insertBefore(`const ${varContext} = await ${varBrowser}.newContext();`);
+
+		// Handle page creation from context (assignment)
+		root
+			.find(j.AssignmentExpression)
+			.filter((path) => {
+				return (
+					path.value?.right?.argument?.callee?.property?.name === 'newPage' &&
+					path.value?.right?.argument?.callee?.object?.name === varBrowser
+				);
+			})
+			.replaceWith(`${varPage} = await ${varContext}.newPage()`);
 
 		// Remove sleeps
 		root
