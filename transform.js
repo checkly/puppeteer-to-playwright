@@ -26,8 +26,8 @@ export default function (fileInfo, api) {
 		.find(j.ImportDeclaration)
 		.filter((path) => {
 			return (
-				path?.value?.source?.value === 'puppeteer' &&
-				path?.value?.source?.type === 'Literal'
+				path.value?.source?.value === 'puppeteer' &&
+				path.value?.source?.type === 'Literal'
 			);
 		})
 
@@ -62,12 +62,12 @@ export default function (fileInfo, api) {
 			.find(j.Identifier, { name: 'puppeteer' })
 			.filter((path) => {
 				return (
-					path.parent.value.type === 'VariableDeclarator' &&
-					path.parent.value.init.type === 'CallExpression' &&
-					path.parent.value.init.callee.type === 'Identifier' &&
-					path.parent.value.init.callee.name === 'require' &&
-					path.parent.value.init.arguments[0].type === 'Literal' &&
-					path.parent.value.init.arguments[0].value === 'puppeteer'
+					path.parent?.value?.type === 'VariableDeclarator' &&
+					path.parent?.value?.init?.type === 'CallExpression' &&
+					path.parent?.value?.init?.callee?.type === 'Identifier' &&
+					path.parent?.value?.init?.callee?.name === 'require' &&
+					path.parent?.value?.init?.arguments[0]?.type === 'Literal' &&
+					path.parent?.value?.init?.arguments[0]?.value === 'puppeteer'
 				);
 			})
 			.replaceWith((path) => {
@@ -79,7 +79,7 @@ export default function (fileInfo, api) {
 			.find(j.Identifier, { name: 'puppeteer' })
 			.filter((path) => {
 				return (
-					path?.parent?.value?.type === 'ImportDefaultSpecifier'
+					path.parent?.value?.type === 'ImportDefaultSpecifier'
 				);
 			})
 			.replaceWith((path) => {
@@ -104,7 +104,7 @@ export default function (fileInfo, api) {
 				}
 				return (
 					path.value?.declarations[0]?.init?.argument?.callee?.property?.name === 'createIncognitoBrowserContext' &&
-					path.value.declarations[0].init.argument.callee.object.name === varBrowser
+					path.value?.declarations[0]?.init?.argument?.callee?.object?.name === varBrowser
 				);
 			})
 			.remove();
@@ -118,7 +118,7 @@ export default function (fileInfo, api) {
 				}
 				return (
 					path.value?.declarations[0]?.init?.argument?.callee?.property?.name === 'newPage' &&
-					path.value.declarations[0].init.argument.callee.object.name === varBrowser
+					path.value?.declarations[0]?.init?.argument?.callee?.object?.name === varBrowser
 				);
 			})
 			.insertBefore(`const ${varContext} = await ${varBrowser}.newContext();`);
@@ -129,7 +129,7 @@ export default function (fileInfo, api) {
 			.filter((path) => {
 				return (
 					path.value?.declarations[0]?.init?.argument?.callee?.property?.name === 'newPage' &&
-					path.value.declarations[0].init.argument.callee.object.name === varBrowser
+					path.value?.declarations[0]?.init?.argument?.callee?.object?.name === varBrowser
 				);
 			})
 			.replaceWith(`const ${varPage} = await ${varContext}.newPage();`);
