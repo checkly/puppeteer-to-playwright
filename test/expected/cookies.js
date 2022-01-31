@@ -20,7 +20,7 @@ const fs = require('fs');
 
     const deserializedCookies = JSON.parse(cookies);
     // TODO: ensure the following line references the right context
-    await browserContext.addCookies(deserializedCookies);
+    await context.addCookies(deserializedCookies);
 
     await browser.close();
 })();

@@ -257,7 +257,7 @@ export default function (fileInfo, api) {
 					return path.value?.callee?.property?.name == 'setCookie';
 				})
 				.replaceWith(
-					j.callExpression(j.memberExpression(j.identifier('browserContext'), j.identifier('addCookies'), false), [
+					j.callExpression(j.memberExpression(j.identifier(varContext), j.identifier('addCookies'), false), [
 						j.identifier(elName),
 					])
 				);
