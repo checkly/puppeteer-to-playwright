@@ -28,8 +28,9 @@ The following features are not yet supported, meaning that the corresponding ins
 - File upload
 - File download
 - Request/response interception
+- Multiple contexts / tabs
 
-If you would like to implement these, see our [how to contribute](#-how-to-contribute) section.
+Still, these might very well be implemented in the near future. If you would like to help, see our [how to contribute](#-how-to-contribute) section.
 
 ## 🚢 Getting Started
 
