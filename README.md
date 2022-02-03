@@ -4,7 +4,7 @@
 </p>
 
 <p>
-  <img src="https://img.shields.io/github/workflow/status/checkly/puppeteer-to-playwright/ci?label=test" alt="Github Action - CI Test"/>
+  <img src="https://img.shields.io/github/workflow/status/checkly/puppeteer-to-playwright/test" alt="Github Action - CI Test"/>
   <img src="https://img.shields.io/github/package-json/v/checkly/puppeteer-to-playwright" alt="Github package.json Version" />
 </p>
 <br />
