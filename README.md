@@ -11,7 +11,7 @@
 
 `puppeteer-to-playwright` automatically converts Javascript Puppeteer scripts to Playwright, aiming to reduce the amount of manual work involved in such a migration (ideally reducing it to zero). It is heavily based on [jscodeshift](https://github.com/facebook/jscodeshift).
 
-> puppeteer-to-playwright requires Node.js 14 or newer.
+> puppeteer-to-playwright requires Node.js 14 or newer
 
 ## 👷 Features
 
