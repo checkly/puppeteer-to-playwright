@@ -42,7 +42,7 @@ You can use `puppeteer-to-playwright` on a script file or multiple scripts at a 
 
 ### Dry run
 
-A dry run will run the conversion without acutally writing to the file(s) you point it at.
+A dry run will run the conversion without actually writing to the file(s) you point it at.
 
 ```
 $ npm run convert -- -d my-puppeteer-script.js
